@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getCurrentUserProfile } from "@/lib/auth/profile";
 import { writeAuditLog } from "@/lib/auth/authorization";
+import { trySyncStudentAccess } from "@/lib/auth/student-access";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
@@ -73,6 +74,12 @@ export async function GET(request: Request) {
         );
       }
       currentUser = await getCurrentUserProfile(supabase);
+    } else {
+      // No invitation: if this email belongs to a student record (for
+      // example a student added before automatic access existed), give them
+      // the student role straight away.
+      const access = await trySyncStudentAccess([email]);
+      if (access?.activated) currentUser = await getCurrentUserProfile(supabase);
     }
   }
   const destination =

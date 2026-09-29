@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import Papa from "papaparse";
 import { getCurrentUserProfile } from "@/lib/auth/profile";
+import { trySyncStudentAccess } from "@/lib/auth/student-access";
 import { writeAuditLog } from "@/lib/auth/authorization";
 import {
   deduplicateRowsByWeekAndEmail,
@@ -905,7 +906,11 @@ export async function POST(request: Request) {
         },
       );
 
+      // Students in this CSV get sign-in access with the student role.
+      const access = await trySyncStudentAccess(rows.map((row) => row.email));
+
       return NextResponse.json({
+        access,
         message: "Student provisioning completed",
         status,
         totalRows: rowResults.length,
@@ -1109,7 +1114,10 @@ export async function POST(request: Request) {
           console.error("[api/import] multi-week audit logging failed", auditError);
         }
 
+        const access = await trySyncStudentAccess(rows.map((row) => row.email));
+
         return NextResponse.json({
+          access,
           status: "imported",
           message: "Multi-week import completed",
           summary: { ...summary, errors: 0 },
@@ -1527,7 +1535,10 @@ export async function POST(request: Request) {
       };
     });
 
+    const access = await trySyncStudentAccess(rows.map((row) => row.email));
+
     return NextResponse.json({
+      access,
       message: "Import completed",
       importId: importRecord.id,
       week: {

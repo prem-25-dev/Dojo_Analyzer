@@ -3,6 +3,7 @@ import { getCurrentUserProfile } from "@/lib/auth/profile";
 import { createRequestSupabaseClient } from "@/lib/auth/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { writeAuditLog } from "@/lib/auth/authorization";
+import { trySyncStudentAccess } from "@/lib/auth/student-access";
 
 function isManagerOrMentor(role: string) {
   return role === "campus_manager" || role === "mentor";
@@ -256,6 +257,9 @@ export async function POST(request: Request) {
       },
     );
 
+    // Give the new student sign-in access with the student role.
+    const access = await trySyncStudentAccess([student.email]);
+
     return NextResponse.json(
       {
         student: {
@@ -265,6 +269,7 @@ export async function POST(request: Request) {
           start_date: membership.start_date,
           end_date: membership.end_date,
         },
+        access,
       },
       { status: 201 },
     );

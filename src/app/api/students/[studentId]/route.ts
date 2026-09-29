@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUserProfile } from "@/lib/auth/profile";
 import { createRequestSupabaseClient } from "@/lib/auth/server";
 import { writeAuditLog } from "@/lib/auth/authorization";
+import { trySyncStudentAccess } from "@/lib/auth/student-access";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 type RouteContext = {
@@ -229,6 +230,20 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (squadError) {
       throw squadError;
     }
+
+    // Keep sign-in access in step with the record: a changed email drops
+    // the old pending student invitation and grants access to the new one.
+    if (updates.email) {
+      const { error: staleInviteError } = await supabaseAdmin
+        .from("user_invitations")
+        .delete()
+        .eq("student_id", studentId)
+        .eq("role", "student")
+        .neq("email", updates.email);
+      if (staleInviteError)
+        console.error("Stale student invitation cleanup failed:", staleInviteError);
+    }
+    await trySyncStudentAccess([student.email]);
 
     return NextResponse.json({
       student: {
