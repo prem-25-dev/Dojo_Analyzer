@@ -1,0 +1,640 @@
+@import "tailwindcss";
+
+/* Dark mode follows the data-theme attribute set by the theme toggle. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ─── Theme tokens ──────────────────────────────────────────────────────────
+   Light is palette A "Graphite & Ember". Every text token clears 4.5:1 on its
+   surface in both themes (faint is for placeholders/decoration only). Chart
+   hues are validated for colour-vision deficiency per theme.               */
+:root {
+  color-scheme: light;
+  --page: #f4f3f1;
+  --surface: #ffffff;
+  --surface-2: #faf9f7;
+  --sunken: #efeeeb;
+  --line: #e6e4e0;
+  --line-strong: #d6d3ce;
+  --ink: #141414;
+  --ink-2: #3d3b38;
+  --muted: #6b6966;
+  --faint: #8a8782;
+
+  --brand: #ef3837;
+  --action: #d32f2e;
+  --action-hover: #b82625;
+  --brand-text: #c42b2a;
+  --brand-soft: #fdeeee;
+  --brand-line: #f3c9c8;
+  --success-text: #1e7a3c;
+  --success-soft: #e8f5ec;
+  --success-line: #b9e3c8;
+  --warning-text: #8a5a00;
+  --warning-soft: #fff6e0;
+
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-strong: rgba(255, 255, 255, 0.94);
+  --glass-rim: rgba(255, 255, 255, 0.95);
+  --glass-sheen: rgba(255, 255, 255, 0.55);
+  --glass-glint: rgba(255, 255, 255, 0.9);
+  --glass-edge: rgba(255, 255, 255, 1);
+  --glass-edge-dim: rgba(255, 255, 255, 0.25);
+  --glass-shadow:
+    0 1px 2px rgba(17, 17, 26, 0.06), 0 8px 28px -6px rgba(17, 17, 26, 0.12),
+    0 24px 60px -24px rgba(198, 40, 40, 0.18);
+  --card-shadow: 0 1px 2px rgba(20, 20, 20, 0.04);
+  --pop-shadow: 0 16px 40px -12px rgba(20, 20, 20, 0.22);
+
+  --chart-grid: #ecebe7;
+  --chart-axis: #d6d3ce;
+  --chart-tick: #8a8782;
+  /* Language hues come from each language's logo. */
+  --lang-cpp: #1f6fc0;
+  --lang-java: #dd6a0c;
+  --lang-nodejs: #3d8f37;
+  --lang-python: #d7a300;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+  --series-8: #e34948;
+  --series-other: #a3a29c;
+  --status-up: #0ca30c;
+  --status-same: #b9b8b1;
+  --status-down: #d03b3b;
+  --status-first: #3e6fb0;
+  --status-untested: #e4e3dd;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0e0e10;
+  --surface: #17171b;
+  --surface-2: #1b1b20;
+  --sunken: #222228;
+  --line: #27272d;
+  --line-strong: #35353c;
+  --ink: #f4f4f5;
+  --ink-2: #d4d4d8;
+  --muted: #9a9aa3;
+  --faint: #74747d;
+
+  --brand: #ef3837;
+  --action: #d32f2e;
+  --action-hover: #e5403f;
+  --brand-text: #ff6b66;
+  --brand-soft: #2a1718;
+  --brand-line: #4a2324;
+  --success-text: #4cc38a;
+  --success-soft: #15291e;
+  --success-line: #1f4a31;
+  --warning-text: #e8b34a;
+  --warning-soft: #2b2413;
+
+  --glass: rgba(23, 23, 27, 0.72);
+  --glass-strong: rgba(27, 27, 32, 0.96);
+  --glass-rim: rgba(255, 255, 255, 0.08);
+  --glass-sheen: rgba(255, 255, 255, 0.05);
+  --glass-glint: rgba(255, 255, 255, 0.1);
+  --glass-edge: rgba(255, 255, 255, 0.16);
+  --glass-edge-dim: rgba(255, 255, 255, 0.04);
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 28px -6px rgba(0, 0, 0, 0.6),
+    0 24px 60px -24px rgba(239, 56, 55, 0.12);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --pop-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+
+  --chart-grid: #25252b;
+  --chart-axis: #35353c;
+  --chart-tick: #7c7c85;
+  --lang-cpp: #3f93e6;
+  --lang-java: #f08a2a;
+  --lang-nodejs: #5cb652;
+  --lang-python: #f0c43a;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+  --series-other: #6e6d68;
+  --status-up: #0ca30c;
+  --status-same: #5c5b57;
+  --status-down: #d03b3b;
+  --status-first: #4f82c9;
+  --status-untested: #2c2c32;
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-sunken: var(--sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-brand: var(--brand);
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-brand-text: var(--brand-text);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-line: var(--brand-line);
+  --color-success-text: var(--success-text);
+  --color-success-soft: var(--success-soft);
+  --color-success-line: var(--success-line);
+  --color-warning-text: var(--warning-text);
+  --color-warning-soft: var(--warning-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-inter-tight), var(--font-geist-sans), sans-serif;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+/* ─── Login stage (dojo-bot) ─────────────────────────────────────────────── */
+@keyframes dojo-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes dojo-shadow {
+  0%, 100% { transform: scaleX(1); opacity: 0.5; }
+  50% { transform: scaleX(0.8); opacity: 0.28; }
+}
+
+@keyframes dojo-flicker {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes dojo-led {
+  0%, 60%, 100% { opacity: 0.2; }
+  15% { opacity: 1; }
+}
+
+@keyframes dojo-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes dojo-scan {
+  from { transform: translateY(0); }
+  to { transform: translateY(77px); }
+}
+
+@keyframes dojo-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dojo-anim {
+    animation: none !important;
+  }
+}
+
+/* ─── Shiny CTA (21st.dev "shiny-button" by designali-in, adapted) ─────────
+   Red highlight on graphite for the main import/export actions. Font import
+   removed (the app's Inter Tight is used); keyframes are prefixed.         */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@property --gradient-angle-offset {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@property --gradient-percent {
+  syntax: "<percentage>";
+  initial-value: 5%;
+  inherits: false;
+}
+@property --gradient-shine {
+  syntax: "<color>";
+  initial-value: white;
+  inherits: false;
+}
+
+.shiny-cta {
+  --shiny-cta-bg: #141414;
+  --shiny-cta-bg-subtle: #2c2c30;
+  --shiny-cta-fg: #ffffff;
+  --shiny-cta-highlight: #ef3837;
+  --shiny-cta-highlight-subtle: #ff8a86;
+  --animation: shiny-gradient-angle linear infinite;
+  --duration: 3s;
+  --shadow-size: 2px;
+  --transition: 800ms cubic-bezier(0.25, 1, 0.5, 1);
+
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  outline-offset: 4px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--shiny-cta-fg);
+  background:
+    linear-gradient(var(--shiny-cta-bg), var(--shiny-cta-bg)) padding-box,
+    conic-gradient(
+        from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
+        transparent,
+        var(--shiny-cta-highlight) var(--gradient-percent),
+        var(--gradient-shine) calc(var(--gradient-percent) * 2),
+        var(--shiny-cta-highlight) calc(var(--gradient-percent) * 3),
+        transparent calc(var(--gradient-percent) * 4)
+      )
+      border-box;
+  box-shadow: inset 0 0 0 1px var(--shiny-cta-bg-subtle);
+  transition: var(--transition);
+  transition-property: --gradient-angle-offset, --gradient-percent,
+    --gradient-shine;
+}
+
+[data-theme="dark"] .shiny-cta {
+  --shiny-cta-bg: #1d1d22;
+  --shiny-cta-bg-subtle: #34343c;
+}
+
+.shiny-cta::before,
+.shiny-cta::after,
+.shiny-cta > span::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  z-index: -1;
+}
+
+.shiny-cta:active {
+  translate: 0 1px;
+}
+
+/* Dots pattern */
+.shiny-cta::before {
+  --size: calc(100% - var(--shadow-size) * 3);
+  --position: 2px;
+  --space: calc(var(--position) * 2);
+  width: var(--size);
+  height: var(--size);
+  background: radial-gradient(
+      circle at var(--position) var(--position),
+      white calc(var(--position) / 4),
+      transparent 0
+    )
+    padding-box;
+  background-size: var(--space) var(--space);
+  background-repeat: space;
+  mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+  border-radius: inherit;
+  opacity: 0.4;
+}
+
+/* Inner shimmer */
+.shiny-cta::after {
+  --animation: shiny-shimmer linear infinite;
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(
+    -50deg,
+    transparent,
+    var(--shiny-cta-highlight),
+    transparent
+  );
+  mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  opacity: 0.6;
+}
+
+.shiny-cta > span {
+  z-index: 1;
+}
+
+.shiny-cta > span::before {
+  --size: calc(100% + 1rem);
+  width: var(--size);
+  height: var(--size);
+  box-shadow: inset 0 -1ex 2rem 4px var(--shiny-cta-highlight);
+  opacity: 0;
+  transition: opacity var(--transition);
+  animation: calc(var(--duration) * 1.5) shiny-breathe linear infinite;
+}
+
+.shiny-cta,
+.shiny-cta::before,
+.shiny-cta::after {
+  animation:
+    var(--animation) var(--duration),
+    var(--animation) calc(var(--duration) / 0.4) reverse paused;
+  animation-composition: add;
+}
+
+.shiny-cta:is(:hover, :focus-visible) {
+  --gradient-percent: 20%;
+  --gradient-angle-offset: 95deg;
+  --gradient-shine: var(--shiny-cta-highlight-subtle);
+}
+
+.shiny-cta:is(:hover, :focus-visible),
+.shiny-cta:is(:hover, :focus-visible)::before,
+.shiny-cta:is(:hover, :focus-visible)::after {
+  animation-play-state: running;
+}
+
+.shiny-cta:is(:hover, :focus-visible) > span::before {
+  opacity: 1;
+}
+
+@keyframes shiny-gradient-angle {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+@keyframes shiny-shimmer {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes shiny-breathe {
+  from,
+  to {
+    scale: 1;
+  }
+  50% {
+    scale: 1.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shiny-cta,
+  .shiny-cta::before,
+  .shiny-cta::after,
+  .shiny-cta > span::before {
+    animation: none;
+  }
+}
+
+/* ─── Offer hover (21st.dev "offer-button", adapted) ────────────────────────
+   Hovering the trigger slides two small drawers out above and below it. Used
+   on the navbar Dashboard link: corner brackets removed, drawers sized to fit
+   inside the 64px bar (36px link + 14px space either side), palette colours,
+   plain CSS instead of styled-components.                                   */
+.offer-container {
+  --offer-timing: cubic-bezier(0, 0, 0, 2.5);
+  --offer-duration: 250ms;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.offer-trigger {
+  transition: transform var(--offer-duration) var(--offer-timing);
+}
+
+.offer-drawer {
+  position: absolute;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  white-space: nowrap;
+  height: 16px;
+  padding: 0 0.55em;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #fff;
+  background: linear-gradient(#fff3, #0001), var(--action);
+  opacity: 0;
+  pointer-events: none;
+  filter: blur(2px);
+  transition:
+    transform calc(0.5 * var(--offer-duration)) ease,
+    filter var(--offer-duration) var(--offer-timing),
+    opacity calc(0.5 * var(--offer-duration)) ease;
+}
+
+.offer-drawer-top {
+  top: 0;
+  left: 0;
+  border-radius: 8px 8px 0 0;
+  align-items: center;
+}
+
+.offer-drawer-bottom {
+  bottom: 0;
+  right: 0;
+  border-radius: 0 0 8px 8px;
+  align-items: center;
+}
+
+.offer-container:has(.offer-trigger:hover, .offer-trigger:focus-visible)
+  .offer-trigger {
+  transform: scale(1.04);
+}
+
+.offer-container:has(.offer-trigger:hover, .offer-trigger:focus-visible)
+  .offer-drawer {
+  opacity: 1;
+  filter: blur(0);
+  animation: offer-hue 3s infinite linear;
+}
+
+.offer-container:has(.offer-trigger:hover, .offer-trigger:focus-visible)
+  .offer-drawer-top {
+  transform: translateY(-11px) rotateZ(1.5deg);
+}
+
+.offer-container:has(.offer-trigger:hover, .offer-trigger:focus-visible)
+  .offer-drawer-bottom {
+  transform: translateY(11px) rotateZ(1.5deg);
+}
+
+.offer-container:has(.offer-trigger:active) .offer-trigger {
+  transform: scale(0.96);
+}
+
+.offer-container:has(.offer-trigger:active) .offer-drawer {
+  transform: translateY(0) scale(0.5);
+}
+
+@keyframes offer-hue {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(-25deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offer-trigger,
+  .offer-drawer {
+    transition: none;
+    animation: none !important;
+  }
+}
+
+/* ─── Leaderboard ────────────────────────────────────────────────────────── */
+@keyframes crown-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(4deg);
+  }
+}
+
+/* ─── Skeletons ──────────────────────────────────────────────────────────── */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--sunken);
+  border-radius: 0.5rem;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--surface) 70%, transparent),
+    transparent
+  );
+  animation: skeleton-sweep 1.6s ease-in-out infinite;
+}
+[data-theme="dark"] .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+}
+@keyframes skeleton-sweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+@keyframes status-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after,
+  .status-dot {
+    animation: none;
+  }
+}
+
+/* ─── Dojo loader ────────────────────────────────────────────────────────── */
+.dojo-loader {
+  /* Quick loads finish before this delay, so the loader never flashes. */
+  animation: dojo-loader-in 0.45s 0.18s ease-out both;
+}
+@keyframes dojo-loader-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dojo-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+}
+@keyframes dojo-belt-fill {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  45% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  55% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+@keyframes podium-ghost {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dojo-loader {
+    animation: none;
+  }
+}
+
+/* ─── Dot matrix background ──────────────────────────────────────────────── */
+/* Faint dot grid fixed behind every app page. */
+:root {
+  --dot: rgba(20, 20, 20, 0.07);
+}
+[data-theme="dark"] {
+  --dot: rgba(255, 255, 255, 0.05);
+}
+.dot-matrix {
+  background-color: var(--page);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
+  background-size: 16px 16px;
+  background-attachment: fixed;
+}
