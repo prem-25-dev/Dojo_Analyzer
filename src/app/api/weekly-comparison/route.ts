@@ -36,6 +36,13 @@ type BeltRecord = {
   final_belt_levels: Record<string, unknown> | null;
 };
 
+type HistoryRecord = BeltRecord & { key: number };
+
+/** Sortable position of a week: academic year, then week number. */
+function weekKey(week: { academic_year: number; week_number: number }) {
+  return week.academic_year * 100 + week.week_number;
+}
+
 type LanguageComparison = Record<
   Language,
   { from: number | null; to: number | null }
@@ -82,6 +89,57 @@ function total(values: Record<Language, number> | null) {
   return values
     ? LANGUAGES.reduce((sum, language) => sum + values[language], 0)
     : null;
+}
+
+/**
+ * Every current belt record for these students up to (and including) the
+ * given week, oldest first. Paged because PostgREST returns at most 1000
+ * rows per request.
+ */
+async function loadHistory(
+  studentIds: string[],
+  untilKey: number,
+  universityId: string | null,
+) {
+  const byStudent = new Map<string, HistoryRecord[]>();
+  for (let chunk = 0; chunk < studentIds.length; chunk += 200) {
+    const ids = studentIds.slice(chunk, chunk + 200);
+    for (let from = 0; ; from += 1000) {
+      let query = supabaseAdmin
+        .from("weekly_belt_records")
+        .select(
+          "student_id, week_id, final_belt_levels, weeks!inner(university_id, academic_year, week_number), imports!inner(is_current)",
+        )
+        .in("student_id", ids)
+        .eq("imports.is_current", true)
+        .range(from, from + 999);
+      if (universityId) query = query.eq("weeks.university_id", universityId);
+      const { data, error } = await query;
+      if (error) throw error;
+      for (const row of data ?? []) {
+        const week = nested(
+          row.weeks as
+            | { academic_year: number; week_number: number }
+            | Array<{ academic_year: number; week_number: number }>
+            | null,
+        );
+        if (!week) continue;
+        const key = weekKey(week);
+        if (key > untilKey) continue;
+        const list = byStudent.get(row.student_id) ?? [];
+        list.push({
+          student_id: row.student_id,
+          week_id: row.week_id,
+          final_belt_levels: row.final_belt_levels,
+          key,
+        });
+        byStudent.set(row.student_id, list);
+      }
+      if (!data || data.length < 1000) break;
+    }
+  }
+  for (const list of byStudent.values()) list.sort((a, b) => a.key - b.key);
+  return byStudent;
 }
 
 function isStatus(value: string): value is ComparisonStatus {
@@ -295,9 +353,18 @@ export async function GET(request: Request) {
     }
 
     const studentIds = new Set<string>(
-      (recordsResult.data ?? []).map(
-        (record) => (record as BeltRecord).student_id,
-      ),
+      (comparisonRecords as BeltRecord[]).map((record) => record.student_id),
+    );
+
+    // A student without a record in the start week still has belts from
+    // earlier weeks: carry their latest earlier record forward instead of
+    // treating them as starting from zero.
+    const fromKey = weekKey(fromWeek);
+    const toKey = weekKey(toWeek);
+    const history = await loadHistory(
+      [...studentIds],
+      Math.max(fromKey, toKey),
+      isSuperAdmin ? (universityId ?? null) : authenticatedUniversityId!,
     );
     const universityIds = [
       ...new Set(
@@ -329,10 +396,13 @@ export async function GET(request: Request) {
 
         const student = nested(membership.students);
         const squad = nested(membership.squads);
-        const fromRecord = recordsByStudentWeek.get(
-          `${studentId}:${fromWeekId}`,
-        );
-        const toRecord = recordsByStudentWeek.get(`${studentId}:${toWeekId}`);
+        const records = history.get(studentId) ?? [];
+        const fromRecord =
+          recordsByStudentWeek.get(`${studentId}:${fromWeekId}`) ??
+          [...records].reverse().find((record) => record.key <= fromKey);
+        const toRecord =
+          recordsByStudentWeek.get(`${studentId}:${toWeekId}`) ??
+          records.find((record) => record.key === toKey);
         const fromLanguages = recordLanguages(fromRecord);
         const toLanguages = recordLanguages(toRecord);
         const fromInvalid = Boolean(fromRecord && !fromLanguages);
